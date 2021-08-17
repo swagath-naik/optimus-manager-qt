@@ -490,7 +490,10 @@ void OptimusManager::logout()
     QDBusInterface deepin(QStringLiteral("com.deepin.SessionManager"), QStringLiteral("/com/deepin/SessionManager"), QStringLiteral("com.deepin.SessionManager"));
     if (deepin.call(QStringLiteral("RequestLogout")).type() == QDBusMessage::ReplyMessage)
         return;
-
+    
+    if (QProcess::execute(QStringLiteral("pkill"), {QStringLiteral("-SIGTERM"),QStringLiteral("lxsession")}) == 0)
+        return;
+    
     if (QProcess::execute(QStringLiteral("i3-msg"), {QStringLiteral("exit")}) == 0)
         return;
 
@@ -506,7 +509,6 @@ void OptimusManager::logout()
     if (QProcess::execute(QStringLiteral("bspc"), {QStringLiteral("quit")}) == 0)
         return;
 
-    killProcess("/usr/bin/lxsession");
     killProcess("/usr/bin/dwm");
     killProcess("/usr/local/bin/dwm");
     killProcess("/usr/bin/qtile-cmd -o cmd -f shutdown");
