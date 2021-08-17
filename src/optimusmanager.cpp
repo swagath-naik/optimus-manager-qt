@@ -491,7 +491,7 @@ void OptimusManager::logout()
     if (deepin.call(QStringLiteral("RequestLogout")).type() == QDBusMessage::ReplyMessage)
         return;
     
-    if (QProcess::execute(QStringLiteral("pkill), {QStringLiteral("-SIGTERM"),QStringLiteral("lxsession")}) == 0)
+    if (QProcess::execute(QStringLiteral("pkill"), {QStringLiteral("-SIGTERM"),QStringLiteral("lxsession")}) == 0)
         return;
     
     if (QProcess::execute(QStringLiteral("i3-msg"), {QStringLiteral("exit")}) == 0)
