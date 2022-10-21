@@ -17,22 +17,19 @@
  *  along with Optimus Manager Qt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cmake.h"
-#include "optimusmanager.h"
-#include "singleapplication.h"
-#include "settings/appsettings.h"
+#include "xdgdesktopportal.h"
 
-int main(int argc, char *argv[])
+#include <QDebug>
+#include <QWindow>
+#include <QX11Info>
+
+QString XdgDesktopPortal::parentWindow(const QWindow *activeWindow)
 {
-    SingleApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral(APPLICATION_NAME));
-    QCoreApplication::setOrganizationName(QStringLiteral(ORGANIZATION_NAME));
-    QCoreApplication::setApplicationVersion(QStringLiteral("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH));
-    QGuiApplication::setDesktopFileName(QStringLiteral(DESKTOP_FILE));
-    QGuiApplication::setQuitOnLastWindowClosed(false);
+    if (!QX11Info::isPlatformX11()) {
+        // TODO Implement Wayland window ID using https://wayland.app/protocols/xdg-foreign-unstable-v2
+        qWarning() << "Retrieving XDP window ID on Wayland not implemented";
+        return {};
+    }
 
-    // Tray menu
-    OptimusManager manager;
-
-    return QCoreApplication::exec();
+    return QStringLiteral("x11:%1").arg(activeWindow->winId(), 0, 16);
 }

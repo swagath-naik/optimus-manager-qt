@@ -17,22 +17,36 @@
  *  along with Optimus Manager Qt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cmake.h"
-#include "optimusmanager.h"
-#include "singleapplication.h"
-#include "settings/appsettings.h"
+#ifndef PORTALAUTOSTARTMANAGER_H
+#define PORTALAUTOSTARTMANAGER_H
 
-int main(int argc, char *argv[])
+#include "abstractautostartmanager.h"
+
+#include <QDBusInterface>
+
+class QDBusPendingCallWatcher;
+
+class PortalAutostartManager : public AbstractAutostartManager
 {
-    SingleApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral(APPLICATION_NAME));
-    QCoreApplication::setOrganizationName(QStringLiteral(ORGANIZATION_NAME));
-    QCoreApplication::setApplicationVersion(QStringLiteral("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH));
-    QGuiApplication::setDesktopFileName(QStringLiteral(DESKTOP_FILE));
-    QGuiApplication::setQuitOnLastWindowClosed(false);
+    Q_OBJECT
+    Q_DISABLE_COPY(PortalAutostartManager)
 
-    // Tray menu
-    OptimusManager manager;
+public:
+    explicit PortalAutostartManager(QObject *parent = nullptr);
 
-    return QCoreApplication::exec();
-}
+    bool isAutostartEnabled() const override;
+    void setAutostartEnabled(bool enabled) override;
+
+    static bool isAvailable();
+
+signals:
+    void responseParsed();
+
+private slots:
+    void parsePortalResponse(quint32, const QVariantMap &results);
+
+private:
+    static QDBusInterface s_interface;
+};
+
+#endif // PORTALAUTOSTARTMANAGER_H

@@ -17,22 +17,21 @@
  *  along with Optimus Manager Qt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cmake.h"
-#include "optimusmanager.h"
-#include "singleapplication.h"
-#include "settings/appsettings.h"
+#ifndef UNIXAUTOSTARTMANAGER_H
+#define UNIXAUTOSTARTMANAGER_H
 
-int main(int argc, char *argv[])
+#include "abstractautostartmanager.h"
+
+class UnixAutostartManager : public AbstractAutostartManager
 {
-    SingleApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral(APPLICATION_NAME));
-    QCoreApplication::setOrganizationName(QStringLiteral(ORGANIZATION_NAME));
-    QCoreApplication::setApplicationVersion(QStringLiteral("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH));
-    QGuiApplication::setDesktopFileName(QStringLiteral(DESKTOP_FILE));
-    QGuiApplication::setQuitOnLastWindowClosed(false);
+    Q_OBJECT
+    Q_DISABLE_COPY(UnixAutostartManager)
 
-    // Tray menu
-    OptimusManager manager;
+public:
+    explicit UnixAutostartManager(QObject *parent = nullptr);
 
-    return QCoreApplication::exec();
-}
+    bool isAutostartEnabled() const override;
+    void setAutostartEnabled(bool enabled) override;
+};
+
+#endif // UNIXAUTOSTARTMANAGER_H

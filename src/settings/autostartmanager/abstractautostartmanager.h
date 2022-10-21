@@ -17,22 +17,26 @@
  *  along with Optimus Manager Qt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cmake.h"
-#include "optimusmanager.h"
-#include "singleapplication.h"
-#include "settings/appsettings.h"
+#ifndef ABSTRACTAUTOSTARTMANAGER_H
+#define ABSTRACTAUTOSTARTMANAGER_H
 
-int main(int argc, char *argv[])
+#include <QObject>
+
+class AbstractAutostartManager : public QObject
 {
-    SingleApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral(APPLICATION_NAME));
-    QCoreApplication::setOrganizationName(QStringLiteral(ORGANIZATION_NAME));
-    QCoreApplication::setApplicationVersion(QStringLiteral("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH));
-    QGuiApplication::setDesktopFileName(QStringLiteral(DESKTOP_FILE));
-    QGuiApplication::setQuitOnLastWindowClosed(false);
+    Q_OBJECT
+    Q_DISABLE_COPY(AbstractAutostartManager)
 
-    // Tray menu
-    OptimusManager manager;
+public:
+    static AbstractAutostartManager *createAutostartManager(QObject *parent = nullptr);
 
-    return QCoreApplication::exec();
-}
+    virtual bool isAutostartEnabled() const = 0;
+    virtual void setAutostartEnabled(bool enabled) = 0;
+
+protected:
+    explicit AbstractAutostartManager(QObject *parent = nullptr);
+
+    static void showError(const QString &informativeText);
+};
+
+#endif // ABSTRACTAUTOSTARTMANAGER_H

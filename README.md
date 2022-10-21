@@ -1,7 +1,6 @@
-# ![Optimus Manager Qt logo](data/icons/freedesktop/48-apps-optimus-manager.svg) Optimus Manager Qt
+# ![Optimus Manager Qt logo](data/icons/app/48-apps-optimus-manager.svg) Optimus Manager Qt
 
 [![GitHub (pre-)release](https://img.shields.io/github/release/Shatur95/optimus-manager-qt/all.svg)](https://github.com/Shatur95/optimus-manager-qt/releases)
-[![Codacy grade](https://img.shields.io/codacy/grade/5cd6782b094743eaa6fe35bc20650914.svg)](https://app.codacy.com/project/Shatur95/optimus-manager-qt/dashboard)
 [![Crowdin](https://badges.crowdin.net/optimus-manager-qt/localized.svg)](https://crowdin.com/project/optimus-manager-qt)
 
 **Optimus Manager Qt** is an interface for **Optimus Manager** that allows to configure and switch GPUs on Optimus laptops using the tray menu.
@@ -79,4 +78,4 @@ You will then get a binary named `optimus-manager-qt`.
 
 ## Localization
 
-To help with localization you can use [Crowdin](https://crowdin.com/project/optimus-manager-qt) or translate files in `data/translations` with [Qt Linguist](https://doc.qt.io/Qt-5/linguist-translators.html) directly. To add a new language, write me on the Crowdin project page or copy `data/translations/optimus-manager.ts` to `data/translations/optimus-manager_<ISO 639-1 language code>.ts`, translate it and send a pull request.
+To help with localization you can use [Crowdin](https://crowdin.com/project/optimus-manager-qt) or translate files in `data/translations` with [Qt Linguist](https://doc.qt.io/Qt-5/linguist-translators.html) directly. To add a new language, write me on the Crowdin project page or copy `data/translations/optimus-manager.ts` to `data/translations/optimus-manager_<ISO 639-1 language code>_<ISO 3166-1 country code>.ts`, translate it and send a pull request.

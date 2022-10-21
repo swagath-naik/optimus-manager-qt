@@ -1,11 +1,11 @@
 /*
- *  Copyright © 2019-2021 Hennadii Chernyshchyk <genaloner@gmail.com>
+ *  Copyright © 2019-2022 Hennadii Chernyshchyk <genaloner@gmail.com>
  *
  *  This file is part of Optimus Manager Qt.
  *
- *  Optimus Manager Qt is free software; you can redistribute it and/or modify
+ *  Optimus Manager Qt is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
  *  Optimus Manager Qt is distributed in the hope that it will be useful,
@@ -13,16 +13,15 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *  GNU General Public License for more details.
  *
- *  You should have received a get of the GNU General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Optimus Manager Qt. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include "optimusmanager.h"
 
 #include "daemonclient.h"
 #include "session.h"
-#include "settingsdialog.h"
+#include "settings/settingsdialog.h"
 
 #include <QCoreApplication>
 #include <QDBusArgument>
@@ -35,6 +34,7 @@
 #include <QMessageBox>
 #include <QMetaEnum>
 #include <QProcess>
+#include <QSettings>
 #ifdef WITH_PLASMA
 #include <KStatusNotifierItem>
 #else
@@ -191,15 +191,15 @@ void OptimusManager::switchMode(OptimusSettings::Mode switchingMode)
         message.setIcon(QMessageBox::Critical);
         message.setText(tr("The %1 is running.").arg(daemon));
         message.setInformativeText(tr("Please enable and start it with:\n'%1'\n'%2'")
-                                   .arg("sudo systemctl enable optimus-manager", "sudo systemctl start optimus-manager"));
+                                       .arg("sudo systemctl enable optimus-manager", "sudo systemctl start optimus-manager"));
         message.exec();
         return;
     }
 
     // Check if power switching enabled
     if (optimusSettings.switchingMethod() == OptimusSettings::NoneMethod
-            && !optimusSettings.isPciPowerControlEnabled()
-            && optimusSettings.nvidiaDynamicPowerManagement() == OptimusSettings::No) {
+        && !optimusSettings.isPciPowerControlEnabled()
+        && optimusSettings.nvidiaDynamicPowerManagement() == OptimusSettings::No) {
         QMessageBox message;
         message.setIcon(QMessageBox::Warning);
         message.setText(tr("No power management option is currently enabled"));
@@ -218,7 +218,7 @@ void OptimusManager::switchMode(OptimusSettings::Mode switchingMode)
             message.setInformativeText(tr("Power switching will not work.\n"
                                           "You can set '%1' for GPU switching in settings or install bbswitch for"
                                           " the default kernel with '%2' or for all kernels with '%3'.")
-                                       .arg("nouveau", "sudo pacman -S bbswitch", "sudo pacman -S bbswitch-dkms"));
+                                           .arg("nouveau", "sudo pacman -S bbswitch", "sudo pacman -S bbswitch-dkms"));
             message.exec();
         }
     }
@@ -257,7 +257,8 @@ void OptimusManager::switchMode(OptimusSettings::Mode switchingMode)
         message.setText(tr("Multiple running sessions detected."));
         message.setInformativeText(tr("There are %1 other desktop sessions open. The GPU switch will not become"
                                       " effective until you have manually logged out from ALL desktop sessions.\n"
-                                      "Continue?").arg(activeSessions - 1));
+                                      "Continue?")
+                                       .arg(activeSessions - 1));
         message.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         if (message.exec() == QMessageBox::No)
             return;
@@ -274,7 +275,7 @@ void OptimusManager::switchMode(OptimusSettings::Mode switchingMode)
             message.setInformativeText(tr("Session %1, started by %2, is a Wayland session."
                                           " Wayland is not supported by Optimus Manager, so GPU switching may fail.\n"
                                           "Continue anyway?")
-                                       .arg(QString::number(session.userId), session.userName));
+                                           .arg(QString::number(session.userId), session.userName));
             message.setStandardButtons(QMessageBox::Yes | QMessageBox::YesToAll | QMessageBox::No);
             message.exec();
             if (message.result() == QMessageBox::No)
@@ -292,7 +293,7 @@ void OptimusManager::switchMode(OptimusSettings::Mode switchingMode)
         message.setInformativeText(tr("This can interfere with Optimus Manager. Before attempting a GPU switch, it is recommended that you disable"
                                       " this service with '%1' and reboot your computer.\n"
                                       "Ignore this warning and proceed with GPU switching now?")
-                                   .arg(QStringLiteral("sudo systemctl disable bumblebeed.service")));
+                                       .arg(QStringLiteral("sudo systemctl disable bumblebeed.service")));
         message.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         if (message.exec() == QMessageBox::No)
             return;
@@ -327,8 +328,8 @@ void OptimusManager::switchMode(OptimusSettings::Mode switchingMode)
 
     // Check if the Xorg driver is installed
     if (switchingMode == OptimusSettings::Integrated
-            && optimusSettings.intelDriver() == OptimusSettings::Intel && !QFileInfo::exists(QStringLiteral("/usr/lib/xorg/modules/drivers/intel_drv.so"))
-            && optimusSettings.amdDriver() == OptimusSettings::Amd && !QFileInfo::exists(QStringLiteral("/usr/lib/xorg/modules/drivers/amdgpu_drv.so"))) {
+        && optimusSettings.intelDriver() == OptimusSettings::Intel && !QFileInfo::exists(QStringLiteral("/usr/lib/xorg/modules/drivers/intel_drv.so"))
+        && optimusSettings.amdDriver() == OptimusSettings::Amd && !QFileInfo::exists(QStringLiteral("/usr/lib/xorg/modules/drivers/amdgpu_drv.so"))) {
         QMessageBox message;
         message.setIcon(QMessageBox::Question);
         message.setText(tr("The Xorg driver is not installed."));
@@ -379,7 +380,7 @@ OptimusSettings::Mode OptimusManager::detectGpu()
     if (jsonError.error != QJsonParseError::NoError)
         qFatal("Unable to parse Optimus Manager state file: %s", qPrintable(jsonError.errorString()));
 
-    QJsonValue modeValue = jsonDocument.object().value(u"current_mode");
+    QJsonValue modeValue = jsonDocument.object().value("current_mode");
     if (modeValue.type() != QJsonValue::String)
         qFatal("Unable to read current mode from Optimus Manager state file");
 
@@ -520,7 +521,7 @@ bool OptimusManager::killProcess(const QByteArray &name)
         const QDir process = it.next();
 
         bool isNumber;
-        pid_t pid = process.dirName().toUInt(&isNumber);
+        pid_t pid = process.dirName().toInt(&isNumber);
         if (!isNumber)
             continue;
 

@@ -1,11 +1,11 @@
 /*
- *  Copyright © 2019-2021 Hennadii Chernyshchyk <genaloner@gmail.com>
+ *  Copyright © 2019-2022 Hennadii Chernyshchyk <genaloner@gmail.com>
  *
  *  This file is part of Optimus Manager Qt.
  *
- *  Optimus Manager Qt is free software; you can redistribute it and/or modify
+ *  Optimus Manager Qt is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
  *  Optimus Manager Qt is distributed in the hope that it will be useful,
@@ -13,18 +13,19 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *  GNU General Public License for more details.
  *
- *  You should have received a get of the GNU General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Optimus Manager Qt. If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef OPTIMUSSETTINGS_H
 #define OPTIMUSSETTINGS_H
 
 #include <QFlags>
-#include <QSettings>
+#include <QObject>
 
-class OptimusSettings : public QSettings
+class QSettings;
+
+class OptimusSettings : public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY(OptimusSettings)
@@ -151,9 +152,9 @@ public:
     void setAmdDriver(AmdDriver driver);
     static AmdDriver defaultAmdDriver();
 
-    bool amdTearFree() const;
+    TearFree amdTearFree() const;
     void setAmdTearFree(TearFree tearFree);
-    static bool defaultAmdTearFree();
+    static TearFree defaultAmdTearFree();
 
     DRI amdDri() const;
     void setAmdDri(DRI dri);
@@ -201,6 +202,8 @@ public:
 private:
     static QStringList nvidiaOptionsToStrings(NvidiaOptions options);
     static NvidiaOptions stringToNvidiaOptions(const QStringList &optionStrings);
+
+    QSettings *m_settings;
 
     // Convert enum values into Optimus Manager strings (no, yes, none etc).
     static const QMap<bool, QString> s_boolMap;

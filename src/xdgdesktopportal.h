@@ -17,22 +17,18 @@
  *  along with Optimus Manager Qt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cmake.h"
-#include "optimusmanager.h"
-#include "singleapplication.h"
-#include "settings/appsettings.h"
+#ifndef XDGDESKTOPPORTAL_H
+#define XDGDESKTOPPORTAL_H
 
-int main(int argc, char *argv[])
+#include <QString>
+
+class QWindow;
+
+namespace XdgDesktopPortal
 {
-    SingleApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral(APPLICATION_NAME));
-    QCoreApplication::setOrganizationName(QStringLiteral(ORGANIZATION_NAME));
-    QCoreApplication::setApplicationVersion(QStringLiteral("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH));
-    QGuiApplication::setDesktopFileName(QStringLiteral(DESKTOP_FILE));
-    QGuiApplication::setQuitOnLastWindowClosed(false);
-
-    // Tray menu
-    OptimusManager manager;
-
-    return QCoreApplication::exec();
+// Retrieve parent window in string form according to
+// https://flatpak.github.io/xdg-desktop-portal/#parent_window
+QString parentWindow(const QWindow *activeWindow);
 }
+
+#endif // XDGDESKTOPPORTAL_H
